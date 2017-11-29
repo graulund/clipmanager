@@ -8,14 +8,24 @@
 
 import Cocoa
 
-class ViewController: NSViewController {
+class ViewController: NSViewController, NSCollectionViewDelegate, NSCollectionViewDataSource, NSCollectionViewDelegateFlowLayout, SoundManagerDelegate {
 
-	@IBOutlet weak var filenameField: NSTextField!
+	@IBOutlet weak var collectionView: NSCollectionView!
 	
 	override func viewDidLoad() {
 		super.viewDidLoad()
 
-		// Do any additional setup after loading the view.
+		// Stay on top of clips
+		SoundManager.defaultManager.delegate = self
+	}
+	
+	// This method will be called everytime window is resized
+	override func viewWillLayout() {
+		super.viewWillLayout()
+		
+		// When we're invalidating the collection view layout
+		// it will call `collectionView(_:layout:sizeForItemAt:)` method
+		collectionView.collectionViewLayout?.invalidateLayout()
 	}
 
 	override var representedObject: Any? {
@@ -23,52 +33,41 @@ class ViewController: NSViewController {
 		// Update the view, if already loaded.
 		}
 	}
-
-	@IBAction func browseFile(_ sender: Any) {
-		let dialog = NSOpenPanel();
-		
-		dialog.title                   = "Choose an audio file";
-		dialog.showsResizeIndicator    = true;
-		dialog.showsHiddenFiles        = false;
-		dialog.canChooseDirectories    = false;
-		dialog.canCreateDirectories    = true;
-		dialog.allowsMultipleSelection = false;
-		dialog.allowedFileTypes        = ["mp3", "wav", "aiff", "aac", "m4a", "caf"];
-		
-		if (dialog.runModal() == NSApplication.ModalResponse.OK) {
-			let optResult = dialog.url // Pathname of the file
-			
-			if let result = optResult {
-				let path = result.path
-				filenameField.stringValue = path
-				self.playSound(url: result)
-			}
-		} else {
-			// User clicked on "Cancel"
-			return
-		}
+	
+	func numberOfSections(in collectionView: NSCollectionView) -> Int {
+		return 1
 	}
 	
-	func playSound(url: URL) {
-		let optData = try? Data(contentsOf: url)
-		
-		guard let data = optData else {
-			print("AaaaaaaaaA")
-			return
-		}
-		
-		//let sound = NSSound(named: NSSound.Name("Blow"))
-		let optSound = NSSound(data: data)
-		
-		if let sound = optSound {
-			print("Set the sound", sound.duration)
-			SoundManager.defaultManager.setSoundForIndex(1, sound: sound)
-		}
-			
-		else {
-			print("No sound :(")
-		}
+	func collectionView(_ collectionView: NSCollectionView, numberOfItemsInSection section: Int) -> Int {
+		return 8 // TODO
 	}
 	
+	func collectionView(_ collectionView: NSCollectionView, itemForRepresentedObjectAt indexPath: IndexPath) -> NSCollectionViewItem {
+		let item = collectionView.makeItem(
+			withIdentifier: NSUserInterfaceItemIdentifier(rawValue: "ClipCollectionViewItem"),
+			for: indexPath
+		)
+		guard let collectionViewItem = item as? ClipCollectionViewItem else { return item }
+		
+		let index = indexPath[indexPath.endIndex - 1]
+		collectionViewItem.clip = SoundManager.defaultManager.getClipForIndex(index)
+		collectionViewItem.index = index
+		return item
+	}
+	
+	func collectionView(
+		_ collectionView: NSCollectionView,
+		layout collectionViewLayout: NSCollectionViewLayout,
+		sizeForItemAt indexPath: IndexPath
+		) -> NSSize {
+		// Here we're telling that we want our cell width to
+		// be equal to our collection view width
+		// and height equals to 70
+		return CGSize(width: collectionView.bounds.width, height: 70)
+	}
+	
+	func onClipsChanged() {
+		self.collectionView.reloadData()
+	}
 }
 

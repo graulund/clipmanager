@@ -17,6 +17,10 @@
 		A153B2EB1FCAB61F0086FA19 /* AudioToolbox.framework in Frameworks */ = {isa = PBXBuildFile; fileRef = A153B2EA1FCAB6190086FA19 /* AudioToolbox.framework */; };
 		A153B2F51FCB60DB0086FA19 /* AMCoreAudio.framework in Frameworks */ = {isa = PBXBuildFile; fileRef = A153B2F31FCB5F660086FA19 /* AMCoreAudio.framework */; };
 		A153B2F61FCB60DB0086FA19 /* AMCoreAudio.framework in Embed Frameworks */ = {isa = PBXBuildFile; fileRef = A153B2F31FCB5F660086FA19 /* AMCoreAudio.framework */; settings = {ATTRIBUTES = (CodeSignOnCopy, RemoveHeadersOnCopy, ); }; };
+		A153B2FD1FCD43BC0086FA19 /* Clip.swift in Sources */ = {isa = PBXBuildFile; fileRef = A153B2FC1FCD43BC0086FA19 /* Clip.swift */; };
+		A153B3001FCDCE6F0086FA19 /* ClipCollectionViewItem.swift in Sources */ = {isa = PBXBuildFile; fileRef = A153B2FE1FCDCE6F0086FA19 /* ClipCollectionViewItem.swift */; };
+		A153B3011FCDCE6F0086FA19 /* ClipCollectionViewItem.xib in Resources */ = {isa = PBXBuildFile; fileRef = A153B2FF1FCDCE6F0086FA19 /* ClipCollectionViewItem.xib */; };
+		A1C9963C1FCF685F009944A1 /* SoundManagerDelegate.swift in Sources */ = {isa = PBXBuildFile; fileRef = A1C9963B1FCF685F009944A1 /* SoundManagerDelegate.swift */; };
 /* End PBXBuildFile section */
 
 /* Begin PBXContainerItemProxy section */
@@ -67,6 +71,10 @@
 		A153B2E71FCAB4AA0086FA19 /* SoundManager.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = SoundManager.swift; sourceTree = "<group>"; };
 		A153B2EA1FCAB6190086FA19 /* AudioToolbox.framework */ = {isa = PBXFileReference; lastKnownFileType = wrapper.framework; name = AudioToolbox.framework; path = System/Library/Frameworks/AudioToolbox.framework; sourceTree = SDKROOT; };
 		A153B2F31FCB5F660086FA19 /* AMCoreAudio.framework */ = {isa = PBXFileReference; lastKnownFileType = wrapper.framework; name = AMCoreAudio.framework; path = "Clip Manager/AMCoreAudio.framework"; sourceTree = "<group>"; };
+		A153B2FC1FCD43BC0086FA19 /* Clip.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = Clip.swift; sourceTree = "<group>"; };
+		A153B2FE1FCDCE6F0086FA19 /* ClipCollectionViewItem.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = ClipCollectionViewItem.swift; sourceTree = "<group>"; };
+		A153B2FF1FCDCE6F0086FA19 /* ClipCollectionViewItem.xib */ = {isa = PBXFileReference; lastKnownFileType = file.xib; path = ClipCollectionViewItem.xib; sourceTree = "<group>"; };
+		A1C9963B1FCF685F009944A1 /* SoundManagerDelegate.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = SoundManagerDelegate.swift; sourceTree = "<group>"; };
 /* End PBXFileReference section */
 
 /* Begin PBXFrameworksBuildPhase section */
@@ -123,10 +131,14 @@
 				A153B2A11FC830B10086FA19 /* AppDelegate.swift */,
 				A153B2A31FC830B10086FA19 /* ViewController.swift */,
 				A153B2E71FCAB4AA0086FA19 /* SoundManager.swift */,
+				A1C9963B1FCF685F009944A1 /* SoundManagerDelegate.swift */,
 				A153B2A51FC830B10086FA19 /* Assets.xcassets */,
 				A153B2A71FC830B10086FA19 /* Main.storyboard */,
 				A153B2AA1FC830B10086FA19 /* Info.plist */,
 				A153B2AB1FC830B10086FA19 /* Clip_Manager.entitlements */,
+				A153B2FC1FCD43BC0086FA19 /* Clip.swift */,
+				A153B2FE1FCDCE6F0086FA19 /* ClipCollectionViewItem.swift */,
+				A153B2FF1FCDCE6F0086FA19 /* ClipCollectionViewItem.xib */,
 			);
 			path = "Clip Manager";
 			sourceTree = "<group>";
@@ -267,6 +279,7 @@
 			buildActionMask = 2147483647;
 			files = (
 				A153B2A61FC830B10086FA19 /* Assets.xcassets in Resources */,
+				A153B3011FCDCE6F0086FA19 /* ClipCollectionViewItem.xib in Resources */,
 				A153B2A91FC830B10086FA19 /* Main.storyboard in Resources */,
 			);
 			runOnlyForDeploymentPostprocessing = 0;
@@ -293,8 +306,11 @@
 			buildActionMask = 2147483647;
 			files = (
 				A153B2A41FC830B10086FA19 /* ViewController.swift in Sources */,
+				A153B2FD1FCD43BC0086FA19 /* Clip.swift in Sources */,
 				A153B2A21FC830B10086FA19 /* AppDelegate.swift in Sources */,
 				A153B2E81FCAB4AA0086FA19 /* SoundManager.swift in Sources */,
+				A1C9963C1FCF685F009944A1 /* SoundManagerDelegate.swift in Sources */,
+				A153B3001FCDCE6F0086FA19 /* ClipCollectionViewItem.swift in Sources */,
 			);
 			runOnlyForDeploymentPostprocessing = 0;
 		};

@@ -15,25 +15,25 @@ import CoreMIDI
 import AMCoreAudio
 
 let clipIndices: Dictionary<Int, Int> = [
-	36: 1,
-	37: 2,
-	38: 3,
-	39: 4,
-	40: 5,
-	41: 6,
-	42: 7,
-	43: 8
+	36: 0,
+	37: 1,
+	38: 2,
+	39: 3,
+	40: 4,
+	41: 5,
+	42: 6,
+	43: 7
 ]
 
 let indexNotes: Dictionary<Int, Int> = [
-	1: 36,
-	2: 37,
-	3: 38,
-	4: 39,
-	5: 40,
-	6: 41,
-	7: 42,
-	8: 43
+	0: 36,
+	1: 37,
+	2: 38,
+	3: 39,
+	4: 40,
+	5: 41,
+	6: 42,
+	7: 43
 ]
 
 func CheckError(_ error: OSStatus, _ operation: String) {
@@ -64,8 +64,10 @@ class SoundManager: NSObject, NSSoundDelegate {
 	var outPort = MIDIPortRef()
 	var outEndpoint = MIDIEndpointRef()
 	
-	private var sounds = Dictionary<Int, NSSound>()
+	var clips = Dictionary<Int, Clip>()
 	private var timers = Dictionary<Int, Timer>()
+	
+	var delegate: SoundManagerDelegate?
 	
 	override init() {
 		super.init()
@@ -74,16 +76,42 @@ class SoundManager: NSObject, NSSoundDelegate {
 		let devices = AudioDevice.allOutputDevices()
 		
 		NSLog("Devices: %@", devices)
+		
+		for device in devices {
+			if let uid = device.uid {
+				print(uid)
+			}
+		}
 	}
 	
-	func setSoundForIndex(_ index: Int, sound: NSSound) {
-		stopSoundForIndex(index)
-		sound.delegate = self
-		NSLog("Set sound %@ to index %d, duration %f", sound, index, sound.duration)
-		sound.playbackDeviceIdentifier = NSSound.PlaybackDeviceIdentifier("AppleUSBAudioEngine:BurrBrown from Texas Instruments:USB AUDIO  CODEC:14514100:1")
-		sounds[index] = sound
+	func setClipForIndex(_ index: Int, clip: Clip) {
+		stopClipForIndex(index)
+		clip.sound.delegate = self
+		NSLog("Set sound %@ to index %d, duration %f", clip.sound, index, clip.sound.duration)
+		clips[index] = clip
+		clipsChanged()
 	}
 	
+	func setDeviceForIndex(_ index: Int, deviceUid: String?) {
+		if let clip = clips[index] {
+			if let uid = deviceUid {
+				clip.sound.playbackDeviceIdentifier = NSSound.PlaybackDeviceIdentifier(uid)
+			}
+			
+			else {
+				clip.sound.playbackDeviceIdentifier = nil
+			}
+		}
+	}
+	
+	private func clipsChanged() {
+		if let delg = delegate {
+			DispatchQueue.main.async {
+				delg.onClipsChanged()
+			}
+		}
+	}
+
 	private func setSoundTimerForIndex(_ index: Int) {
 		if let timer = timers[index] {
 			timer.invalidate()
@@ -97,9 +125,10 @@ class SoundManager: NSObject, NSSoundDelegate {
 	@objc func timerTick(_ timer: Timer) {
 		//NSLog("Timer tick in SoundManager %@", timer.userInfo ?? "<nil>")
 		if let index = timer.userInfo as? NSNumber {
-			if let sound = sounds[index.intValue] {
-				let secsLeft = max(0.0, sound.duration - sound.currentTime)
+			if let clip = clips[index.intValue] {
+				let secsLeft = max(0.0, clip.sound.duration - clip.sound.currentTime)
 				NSLog("Seconds left: %f", secsLeft)
+				clipsChanged()
 			}
 		}
 	}
@@ -116,11 +145,16 @@ class SoundManager: NSObject, NSSoundDelegate {
 			timer.invalidate()
 			timers[index] = nil
 		}
+		
+		if let clip = clips[index] {
+			clip.playing = false
+			clipsChanged()
+		}
 	}
 	
 	func findIndexForSound(_ sound: NSSound) -> Int? {
-		for (index, thisSound) in sounds {
-			if (thisSound == sound) {
+		for (index, thisClip) in clips {
+			if (thisClip.sound == sound) {
 				return index
 			}
 		}
@@ -128,31 +162,33 @@ class SoundManager: NSObject, NSSoundDelegate {
 		return nil
 	}
 	
-	func getSoundForIndex(_ index: Int) -> NSSound? {
-		return sounds[index];
+	func getClipForIndex(_ index: Int) -> Clip? {
+		return clips[index]
 	}
 	
-	func playSoundForIndex(_ index: Int) {
-		if let sound = sounds[index] {
+	func playClipForIndex(_ index: Int) {
+		if let clip = clips[index] {
 			setSoundTimerForIndex(index)
-			sound.play()
+			clip.sound.play()
+			clip.playing = true
+			clipsChanged()
 		}
 	}
 	
-	func stopSoundForIndex(_ index: Int) {
-		if let sound = sounds[index] {
-			sound.stop()
+	func stopClipForIndex(_ index: Int) {
+		if let clip = clips[index] {
+			clip.sound.stop()
 			killSoundTimerForIndex(index)
 		}
 	}
 	
-	func toggleSoundForIndex(_ index: Int) {
+	func toggleClipForIndex(_ index: Int) {
 		if timers[index] != nil {
-			stopSoundForIndex(index)
+			stopClipForIndex(index)
 		}
 		
 		else {
-			playSoundForIndex(index)
+			playClipForIndex(index)
 		}
 	}
 	
@@ -165,7 +201,7 @@ class SoundManager: NSObject, NSSoundDelegate {
 		
 		if let index = optIndex {
 			NSLog("Toggling clip index %d", index)
-			toggleSoundForIndex(index)
+			toggleClipForIndex(index)
 		}
 	}
 	
@@ -288,5 +324,19 @@ class SoundManager: NSObject, NSSoundDelegate {
 			print("  dest \(i): \(endpointName!.takeRetainedValue() as String)")
 			outEndpoint = dest
 		}
+	}
+	
+	func outputDeviceIds() -> [String] {
+		let devices = AudioDevice.allOutputDevices()
+		
+		var list = [String]()
+		
+		for device in devices {
+			if let uid = device.uid {
+				list.append(uid)
+			}
+		}
+		
+		return list
 	}
 }
