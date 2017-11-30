@@ -703,74 +703,6 @@
             <point key="canvasLocation" x="75" y="250"/>
         </scene>
         <!--View Controller-->
-        <scene sceneID="aah-N3-j3g">
-            <objects>
-                <viewController id="hhW-aK-21f" sceneMemberID="viewController">
-                    <view key="view" id="asZ-BE-NRR" customClass="ClipView" customModule="Clip_Manager" customModuleProvider="target">
-                        <rect key="frame" x="0.0" y="0.0" width="478" height="90"/>
-                        <autoresizingMask key="autoresizingMask"/>
-                        <subviews>
-                            <textField horizontalHuggingPriority="251" verticalHuggingPriority="750" fixedFrame="YES" translatesAutoresizingMaskIntoConstraints="NO" id="viW-kn-SyZ">
-                                <rect key="frame" x="17" y="26" width="40" height="44"/>
-                                <autoresizingMask key="autoresizingMask" flexibleMaxX="YES" flexibleMinY="YES"/>
-                                <textFieldCell key="cell" scrollable="YES" lineBreakMode="clipping" sendsActionOnEndEditing="YES" title="1" id="gFg-wI-0aw">
-                                    <font key="font" metaFont="systemBold" size="36"/>
-                                    <color key="textColor" name="labelColor" catalog="System" colorSpace="catalog"/>
-                                    <color key="backgroundColor" name="controlColor" catalog="System" colorSpace="catalog"/>
-                                </textFieldCell>
-                            </textField>
-                            <popUpButton verticalHuggingPriority="750" fixedFrame="YES" translatesAutoresizingMaskIntoConstraints="NO" id="IQN-7Z-SqA">
-                                <rect key="frame" x="156" y="23" width="141" height="26"/>
-                                <autoresizingMask key="autoresizingMask" flexibleMaxX="YES" flexibleMinY="YES"/>
-                                <popUpButtonCell key="cell" type="push" title="Built-in speakers" bezelStyle="rounded" alignment="left" lineBreakMode="truncatingTail" state="on" borderStyle="borderAndBezel" imageScaling="proportionallyDown" inset="2" selectedItem="sXN-Nj-cN4" id="vOf-nF-VHE">
-                                    <behavior key="behavior" lightByBackground="YES" lightByGray="YES"/>
-                                    <font key="font" metaFont="menu"/>
-                                    <menu key="menu" id="7IJ-vv-Y1k">
-                                        <items>
-                                            <menuItem title="Built-in speakers" state="on" id="sXN-Nj-cN4"/>
-                                            <menuItem title="Audio card 1" id="7mf-Zm-ZBO"/>
-                                            <menuItem title="Audio card 2" id="fZ4-O1-Oj2"/>
-                                        </items>
-                                    </menu>
-                                </popUpButtonCell>
-                            </popUpButton>
-                            <button verticalHuggingPriority="750" fixedFrame="YES" translatesAutoresizingMaskIntoConstraints="NO" id="7cm-4g-4gl">
-                                <rect key="frame" x="51" y="19" width="100" height="32"/>
-                                <autoresizingMask key="autoresizingMask" flexibleMaxX="YES" flexibleMinY="YES"/>
-                                <buttonCell key="cell" type="push" title="Select file" bezelStyle="rounded" alignment="center" borderStyle="border" imageScaling="proportionallyDown" inset="2" id="P8a-dy-xUD">
-                                    <behavior key="behavior" pushIn="YES" lightByBackground="YES" lightByGray="YES"/>
-                                    <font key="font" metaFont="system"/>
-                                </buttonCell>
-                                <connections>
-                                    <action selector="browseFile:" target="XfG-lQ-9wD" id="kiK-34-9ev"/>
-                                </connections>
-                            </button>
-                            <textField horizontalHuggingPriority="251" verticalHuggingPriority="750" fixedFrame="YES" translatesAutoresizingMaskIntoConstraints="NO" id="34z-CK-0Rf">
-                                <rect key="frame" x="57" y="53" width="305" height="17"/>
-                                <autoresizingMask key="autoresizingMask" flexibleMaxX="YES" flexibleMinY="YES"/>
-                                <textFieldCell key="cell" scrollable="YES" lineBreakMode="clipping" sendsActionOnEndEditing="YES" title="filename.mp3" id="VUa-K7-nx1">
-                                    <font key="font" metaFont="system"/>
-                                    <color key="textColor" name="labelColor" catalog="System" colorSpace="catalog"/>
-                                    <color key="backgroundColor" name="controlColor" catalog="System" colorSpace="catalog"/>
-                                </textFieldCell>
-                            </textField>
-                            <textField horizontalHuggingPriority="251" verticalHuggingPriority="750" fixedFrame="YES" translatesAutoresizingMaskIntoConstraints="NO" id="ORb-XW-SZC">
-                                <rect key="frame" x="382" y="52" width="78" height="21"/>
-                                <autoresizingMask key="autoresizingMask" flexibleMaxX="YES" flexibleMinY="YES"/>
-                                <textFieldCell key="cell" scrollable="YES" lineBreakMode="clipping" sendsActionOnEndEditing="YES" alignment="right" title="-3:30" id="YcG-cA-ACR">
-                                    <font key="font" metaFont="systemBold" size="18"/>
-                                    <color key="textColor" name="labelColor" catalog="System" colorSpace="catalog"/>
-                                    <color key="backgroundColor" name="controlColor" catalog="System" colorSpace="catalog"/>
-                                </textFieldCell>
-                            </textField>
-                        </subviews>
-                    </view>
-                </viewController>
-                <customObject id="pWS-Q7-VHS" userLabel="First Responder" customClass="NSResponder" sceneMemberID="firstResponder"/>
-            </objects>
-            <point key="canvasLocation" x="622" y="54"/>
-        </scene>
-        <!--View Controller-->
         <scene sceneID="hIz-AP-VOD">
             <objects>
                 <viewController id="XfG-lQ-9wD" customClass="ViewController" customModule="Clip_Manager" customModuleProvider="target" sceneMemberID="viewController">
@@ -787,7 +719,7 @@
                                         <collectionView id="aDA-Az-bxa">
                                             <rect key="frame" x="0.0" y="0.0" width="480" height="158"/>
                                             <autoresizingMask key="autoresizingMask" widthSizable="YES"/>
-                                            <collectionViewFlowLayout key="collectionViewLayout" minimumInteritemSpacing="10" minimumLineSpacing="10" id="lwH-bz-Ca8">
+                                            <collectionViewFlowLayout key="collectionViewLayout" id="lwH-bz-Ca8">
                                                 <size key="itemSize" width="200" height="70"/>
                                             </collectionViewFlowLayout>
                                             <color key="primaryBackgroundColor" name="windowBackgroundColor" catalog="System" colorSpace="catalog"/>

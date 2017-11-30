@@ -66,6 +66,7 @@ class SoundManager: NSObject, NSSoundDelegate {
 	
 	var clips = Dictionary<Int, Clip>()
 	private var timers = Dictionary<Int, Timer>()
+	private var progressDelegates = Dictionary<Int, SoundManagerProgressDelegate>()
 	
 	var delegate: SoundManagerDelegate?
 	
@@ -117,18 +118,15 @@ class SoundManager: NSObject, NSSoundDelegate {
 			timer.invalidate()
 		}
 		
-		let timer = Timer(timeInterval: 0.2, target: self, selector: #selector(timerTick), userInfo: NSNumber(value: Int32(index)), repeats: true)
+		let timer = Timer(timeInterval: 0.05, target: self, selector: #selector(timerTick), userInfo: NSNumber(value: Int32(index)), repeats: true)
 		timers[index] = timer
 		RunLoop.main.add(timer, forMode: .commonModes)
 	}
 	
 	@objc func timerTick(_ timer: Timer) {
-		//NSLog("Timer tick in SoundManager %@", timer.userInfo ?? "<nil>")
 		if let index = timer.userInfo as? NSNumber {
-			if let clip = clips[index.intValue] {
-				let secsLeft = max(0.0, clip.sound.duration - clip.sound.currentTime)
-				NSLog("Seconds left: %f", secsLeft)
-				clipsChanged()
+			if clips[index.intValue] != nil {
+				notifyProgressForIndex(index.intValue)
 			}
 		}
 	}
@@ -148,7 +146,7 @@ class SoundManager: NSObject, NSSoundDelegate {
 		
 		if let clip = clips[index] {
 			clip.playing = false
-			clipsChanged()
+			notifyProgressForIndex(index)
 		}
 	}
 	
@@ -171,7 +169,7 @@ class SoundManager: NSObject, NSSoundDelegate {
 			setSoundTimerForIndex(index)
 			clip.sound.play()
 			clip.playing = true
-			clipsChanged()
+			notifyProgressForIndex(index)
 		}
 	}
 	
@@ -192,8 +190,20 @@ class SoundManager: NSObject, NSSoundDelegate {
 		}
 	}
 	
+	func notifyProgressForIndex(_ index: Int) {
+		if let delegate = progressDelegates[index] {
+			DispatchQueue.main.async {
+				delegate.onClipProgress()
+			}
+		}
+	}
+	
+	func setProgressDelegateForIndex(_ index: Int, delegate: SoundManagerProgressDelegate) {
+		progressDelegates[index] = delegate
+	}
+	
 	func clipIndexForNote(_ note: Int) -> Int? {
-		return clipIndices[note];
+		return clipIndices[note]
 	}
 	
 	func onNoteDown(note: Int) {
@@ -235,7 +245,6 @@ class SoundManager: NSObject, NSSoundDelegate {
 	}
 	
 	private func setupMIDI() {
-		
 		let MIDINotifyCallback: MIDINotifyProc = { message, refCon in
 			// TODO: Reload if messageId == 1
 			print("MIDI notify, messageID=\(message.pointee.messageID.rawValue)")

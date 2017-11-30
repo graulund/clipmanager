@@ -9,11 +9,17 @@
 import Cocoa
 
 let DEFAULT_DEVICE_LABEL = "Default device"
+let ALMOST_DONE_SECONDS: TimeInterval = 10.0
 
-class ClipCollectionViewItem: NSCollectionViewItem {
+let progressColor = NSColor(white: 1.0, alpha: 1.0)
+let almostDoneColor = NSColor(red: 1.0, green: 0.933333, blue: 0.4, alpha: 1.0)
+
+class ClipCollectionViewItem: NSCollectionViewItem, SoundManagerProgressDelegate {
 	@IBOutlet weak var numberField: NSTextField!
 	@IBOutlet weak var progressField: NSTextField!
 	@IBOutlet weak var audioPopUpButton: NSPopUpButton!
+	@IBOutlet weak var progressBox: NSBox!
+	@IBOutlet weak var progressBoxWidth: NSLayoutConstraint!
 	
 	var clip: Clip? {
 		didSet {
@@ -50,12 +56,25 @@ class ClipCollectionViewItem: NSCollectionViewItem {
 			audioPopUpButton.isEnabled = true
 			
 			if theClip.playing {
-				let secsLeft = Int(max(0.0, theClip.sound.duration - theClip.sound.currentTime))
-				progressField.stringValue = "-\(self.secondsToLength(seconds: secsLeft))"
+				let secsLeft = max(0.0, theClip.sound.duration - theClip.sound.currentTime)
+				progressField.stringValue = "-\(self.secondsToLength(seconds: Int(round(secsLeft))))"
+				
+				if secsLeft <= ALMOST_DONE_SECONDS {
+					progressBox.fillColor = almostDoneColor
+				}
+				
+				else {
+					progressBox.fillColor = progressColor
+				}
+				
+				let newWidth = theClip.sound.currentTime / theClip.sound.duration * Double(view.frame.width)
+				progressBoxWidth.constant = CGFloat(newWidth)
+				progressBox.isHidden = false
 			}
 			
 			else {
 				progressField.stringValue = ""
+				progressBox.isHidden = true
 			}
 		}
 			
@@ -63,6 +82,7 @@ class ClipCollectionViewItem: NSCollectionViewItem {
 			textField?.stringValue = ""
 			progressField.stringValue = ""
 			audioPopUpButton.isEnabled = false
+			progressBox.isHidden = true
 		}
 		
 		audioPopUpButton.removeAllItems()
@@ -75,11 +95,13 @@ class ClipCollectionViewItem: NSCollectionViewItem {
 			if let value = audioPopUpButton.titleOfSelectedItem {
 				if value != DEFAULT_DEVICE_LABEL {
 					SoundManager.defaultManager.setDeviceForIndex(currentIndex, deviceUid: value)
+					audioPopUpButton.setTitle(value)
 					return
 				}
 			}
 			
 			SoundManager.defaultManager.setDeviceForIndex(currentIndex, deviceUid: nil)
+			audioPopUpButton.setTitle(DEFAULT_DEVICE_LABEL)
 		}
 	}
 	
@@ -104,7 +126,14 @@ class ClipCollectionViewItem: NSCollectionViewItem {
 	}
 	
 	func selectSound(url: URL) {
-		let optSound = NSSound(contentsOf: url, byReference: false)
+		let optData = try? Data(contentsOf: url)
+		//let optSound = NSSound(contentsOf: url, byReference: false)
+		
+		guard let data = optData else {
+			return
+		}
+		
+		let optSound = NSSound(data: data)
 		
 		if let sound = optSound, let i = index {
 			print("Set the sound", sound.duration)
@@ -115,6 +144,10 @@ class ClipCollectionViewItem: NSCollectionViewItem {
 		else {
 			print("No sound :(")
 		}
+	}
+	
+	func onClipProgress() {
+		updateDataView()
 	}
 	
 	// Time tools

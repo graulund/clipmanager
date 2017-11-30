@@ -50,8 +50,17 @@ class ViewController: NSViewController, NSCollectionViewDelegate, NSCollectionVi
 		guard let collectionViewItem = item as? ClipCollectionViewItem else { return item }
 		
 		let index = indexPath[indexPath.endIndex - 1]
-		collectionViewItem.clip = SoundManager.defaultManager.getClipForIndex(index)
-		collectionViewItem.index = index
+		let clip = SoundManager.defaultManager.getClipForIndex(index)
+		
+		if collectionViewItem.index != index {
+			collectionViewItem.index = index
+			SoundManager.defaultManager.setProgressDelegateForIndex(index, delegate: collectionViewItem)
+		}
+		
+		if collectionViewItem.clip !== clip {
+			collectionViewItem.clip = clip
+		}
+		
 		return item
 	}
 	
@@ -59,7 +68,7 @@ class ViewController: NSViewController, NSCollectionViewDelegate, NSCollectionVi
 		_ collectionView: NSCollectionView,
 		layout collectionViewLayout: NSCollectionViewLayout,
 		sizeForItemAt indexPath: IndexPath
-		) -> NSSize {
+	) -> NSSize {
 		// Here we're telling that we want our cell width to
 		// be equal to our collection view width
 		// and height equals to 70

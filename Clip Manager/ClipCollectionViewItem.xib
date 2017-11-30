@@ -3,6 +3,7 @@
     <dependencies>
         <deployment identifier="macosx"/>
         <plugIn identifier="com.apple.InterfaceBuilder.CocoaPlugin" version="13529"/>
+        <capability name="box content view" minToolsVersion="7.0"/>
         <capability name="documents saved in the Xcode 8 format" minToolsVersion="8.0"/>
     </dependencies>
     <objects>
@@ -17,6 +18,8 @@
             <connections>
                 <outlet property="audioPopUpButton" destination="jqD-yc-M2b" id="KPx-oT-Ev2"/>
                 <outlet property="numberField" destination="qEL-hb-24b" id="9BD-YC-gol"/>
+                <outlet property="progressBox" destination="3zp-0f-gxn" id="8hD-Ys-KdA"/>
+                <outlet property="progressBoxWidth" destination="AL4-uE-XCi" id="TxN-k5-x9f"/>
                 <outlet property="progressField" destination="rm3-Za-cCy" id="ZEC-Nx-eu8"/>
                 <outlet property="textField" destination="n6y-y8-OhW" id="HJ2-jO-L0X"/>
                 <outlet property="view" destination="Hz6-mo-xeY" id="TpR-h4-eu5"/>
@@ -26,6 +29,17 @@
             <rect key="frame" x="0.0" y="0.0" width="480" height="70"/>
             <autoresizingMask key="autoresizingMask" flexibleMaxX="YES" flexibleMinY="YES"/>
             <subviews>
+                <box boxType="custom" borderType="none" borderWidth="0.0" titlePosition="noTitle" translatesAutoresizingMaskIntoConstraints="NO" id="3zp-0f-gxn">
+                    <rect key="frame" x="0.0" y="0.0" width="25" height="70"/>
+                    <view key="contentView" id="sc4-2W-KmH">
+                        <rect key="frame" x="0.0" y="0.0" width="25" height="70"/>
+                        <autoresizingMask key="autoresizingMask" widthSizable="YES" heightSizable="YES"/>
+                    </view>
+                    <constraints>
+                        <constraint firstAttribute="width" constant="25" id="AL4-uE-XCi"/>
+                    </constraints>
+                    <color key="fillColor" red="1" green="1" blue="1" alpha="1" colorSpace="calibratedRGB"/>
+                </box>
                 <textField horizontalHuggingPriority="251" verticalHuggingPriority="750" translatesAutoresizingMaskIntoConstraints="NO" id="qEL-hb-24b">
                     <rect key="frame" x="18" y="14" width="40" height="44"/>
                     <constraints>
@@ -101,7 +115,12 @@
                 <constraint firstAttribute="trailing" secondItem="rm3-Za-cCy" secondAttribute="trailing" constant="21" id="ACu-UC-glR"/>
                 <constraint firstItem="5zZ-rN-ZVC" firstAttribute="top" secondItem="n6y-y8-OhW" secondAttribute="bottom" constant="6" id="AnD-vA-cwx"/>
                 <constraint firstItem="rm3-Za-cCy" firstAttribute="top" secondItem="Hz6-mo-xeY" secondAttribute="top" constant="9" id="Bm2-16-MKM"/>
+                <constraint firstItem="3zp-0f-gxn" firstAttribute="top" secondItem="Hz6-mo-xeY" secondAttribute="top" id="Dom-pJ-15r"/>
                 <constraint firstItem="qEL-hb-24b" firstAttribute="top" secondItem="Hz6-mo-xeY" secondAttribute="top" constant="12" id="KU9-c2-9Xa"/>
+                <constraint firstItem="3zp-0f-gxn" firstAttribute="leading" secondItem="Hz6-mo-xeY" secondAttribute="leading" id="MNb-L7-2tW"/>
+                <constraint firstItem="3zp-0f-gxn" firstAttribute="leading" secondItem="Hz6-mo-xeY" secondAttribute="leading" id="Mpd-Dk-TpO"/>
+                <constraint firstItem="3zp-0f-gxn" firstAttribute="top" secondItem="Hz6-mo-xeY" secondAttribute="top" id="NvL-gi-eqq"/>
+                <constraint firstAttribute="bottom" secondItem="3zp-0f-gxn" secondAttribute="bottom" id="PUg-7S-3l8"/>
                 <constraint firstAttribute="bottom" secondItem="jqD-yc-M2b" secondAttribute="bottom" constant="14" id="PVB-yc-NNH"/>
                 <constraint firstAttribute="bottom" secondItem="qEL-hb-24b" secondAttribute="bottom" constant="14" id="Qb5-ey-lnw"/>
                 <constraint firstItem="5zZ-rN-ZVC" firstAttribute="top" secondItem="n6y-y8-OhW" secondAttribute="bottom" constant="6" id="cgq-al-bcy"/>
@@ -110,6 +129,7 @@
                 <constraint firstItem="n6y-y8-OhW" firstAttribute="top" secondItem="Hz6-mo-xeY" secondAttribute="top" constant="12" id="gfe-bS-c5H"/>
                 <constraint firstItem="jqD-yc-M2b" firstAttribute="top" secondItem="Hz6-mo-xeY" secondAttribute="top" constant="35" id="gsW-gi-abM"/>
                 <constraint firstItem="n6y-y8-OhW" firstAttribute="leading" secondItem="qEL-hb-24b" secondAttribute="trailing" constant="4" id="jdc-Zb-aoc"/>
+                <constraint firstAttribute="bottom" secondItem="3zp-0f-gxn" secondAttribute="bottom" id="sV1-k0-Ubi"/>
                 <constraint firstAttribute="bottom" secondItem="5zZ-rN-ZVC" secondAttribute="bottom" constant="14" id="zQc-E9-jjg"/>
             </constraints>
             <point key="canvasLocation" x="140" y="68"/>
