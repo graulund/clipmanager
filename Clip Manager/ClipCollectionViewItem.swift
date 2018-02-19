@@ -52,30 +52,44 @@ class ClipCollectionViewItem: NSCollectionViewItem, SoundManagerProgressDelegate
 			numberField.stringValue = String(describing: 1 + currentIndex)
 		}
 		
+		audioPopUpButton.removeAllItems()
+		audioPopUpButton.addItem(withTitle: DEFAULT_DEVICE_LABEL)
+		audioPopUpButton.addItems(withTitles: SoundManager.defaultManager.outputDeviceIds())
+
 		if let theClip = clip {
 			textField?.stringValue = theClip.name
 			audioPopUpButton.isEnabled = true
-			
+
 			if theClip.playing {
 				let secsLeft = max(0.0, theClip.sound.duration - theClip.sound.currentTime)
 				progressField.stringValue = "-\(self.secondsToLength(seconds: Int(round(secsLeft))))"
-				
+
 				if secsLeft <= ALMOST_DONE_SECONDS {
 					progressBox.fillColor = almostDoneColor
 				}
-				
+
 				else {
 					progressBox.fillColor = progressColor
 				}
-				
+
 				let newWidth = theClip.sound.currentTime / theClip.sound.duration * Double(view.frame.width)
 				progressBoxWidth.constant = CGFloat(newWidth)
 				progressBox.isHidden = false
 			}
-			
+
 			else {
 				progressField.stringValue = ""
 				progressBox.isHidden = true
+			}
+
+			if #available(OSX 10.13, *) {
+				if let deviceUid = theClip.sound.currentDevice {
+					audioPopUpButton.selectItem(withTitle: deviceUid)
+				}
+
+				else {
+					audioPopUpButton.selectItem(withTitle: DEFAULT_DEVICE_LABEL)
+				}
 			}
 		}
 			
@@ -85,10 +99,6 @@ class ClipCollectionViewItem: NSCollectionViewItem, SoundManagerProgressDelegate
 			audioPopUpButton.isEnabled = false
 			progressBox.isHidden = true
 		}
-		
-		audioPopUpButton.removeAllItems()
-		audioPopUpButton.addItem(withTitle: DEFAULT_DEVICE_LABEL)
-		audioPopUpButton.addItems(withTitles: SoundManager.defaultManager.outputDeviceIds())
 	}
 	
 	@IBAction func audioPopUpClick(_ sender: Any) {
