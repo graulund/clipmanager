@@ -12,6 +12,7 @@ let MIDI_MESSAGE_NOTE_OFF = 8
 import Cocoa
 import CoreAudio
 import CoreMIDI
+import AVFoundation
 import AMCoreAudio
 
 let clipIndices: Dictionary<Int, Int> = [
@@ -58,7 +59,7 @@ func CheckError(_ error: OSStatus, _ operation: String) {
 	exit(1)
 }
 
-class SoundManager: NSObject, NSSoundDelegate {
+class SoundManager: NSObject, AVAudioPlayerDelegate {
 	static let defaultManager = SoundManager()
 	
 	var outPort = MIDIPortRef()
@@ -96,11 +97,19 @@ class SoundManager: NSObject, NSSoundDelegate {
 	func setDeviceForIndex(_ index: Int, deviceUid: String?) {
 		if let clip = clips[index] {
 			if let uid = deviceUid {
-				clip.sound.playbackDeviceIdentifier = NSSound.PlaybackDeviceIdentifier(uid)
+				if #available(OSX 10.13, *) {
+					clip.sound.currentDevice = uid
+				} else {
+					// Fallback on earlier versions
+				}
 			}
 			
 			else {
-				clip.sound.playbackDeviceIdentifier = nil
+				if #available(OSX 10.13, *) {
+					clip.sound.currentDevice = nil
+				} else {
+					// Fallback on earlier versions
+				}
 			}
 		}
 	}
@@ -131,8 +140,8 @@ class SoundManager: NSObject, NSSoundDelegate {
 		}
 	}
 	
-	func sound(_ sound: NSSound, didFinishPlaying flag: Bool) {
-		if let index = findIndexForSound(sound) {
+	func audioPlayerDidFinishPlaying(_ player: AVAudioPlayer, successfully flag: Bool) {
+		if let index = findIndexForSound(player) {
 			killSoundTimerForIndex(index)
 			updateActivityIndicatorForIndex(index)
 		}
@@ -150,7 +159,7 @@ class SoundManager: NSObject, NSSoundDelegate {
 		}
 	}
 	
-	func findIndexForSound(_ sound: NSSound) -> Int? {
+	func findIndexForSound(_ sound: AVAudioPlayer) -> Int? {
 		for (index, thisClip) in clips {
 			if (thisClip.sound == sound) {
 				return index
@@ -167,6 +176,7 @@ class SoundManager: NSObject, NSSoundDelegate {
 	func playClipForIndex(_ index: Int) {
 		if let clip = clips[index] {
 			setSoundTimerForIndex(index)
+			clip.sound.currentTime = 0.0
 			clip.sound.play()
 			clip.playing = true
 			notifyProgressForIndex(index)
@@ -175,7 +185,7 @@ class SoundManager: NSObject, NSSoundDelegate {
 	
 	func stopClipForIndex(_ index: Int) {
 		if let clip = clips[index] {
-			clip.sound.stop()
+			clip.sound.pause()
 			killSoundTimerForIndex(index)
 		}
 	}

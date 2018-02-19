@@ -7,15 +7,16 @@
 //
 
 import Cocoa
+import AVFoundation
 
 class Clip: NSObject {
 	var name: String
 	var url: URL
-	var sound: NSSound
+	var sound: AVAudioPlayer
 	
 	var playing = false
 	
-	init(url: URL, sound: NSSound) {
+	init(url: URL, sound: AVAudioPlayer) {
 		self.name = url.lastPathComponent
 		self.url = url
 		self.sound = sound

@@ -7,6 +7,7 @@
 //
 
 import Cocoa
+import AVFoundation
 
 let DEFAULT_DEVICE_LABEL = "Default device"
 let ALMOST_DONE_SECONDS: TimeInterval = 10.0
@@ -127,23 +128,28 @@ class ClipCollectionViewItem: NSCollectionViewItem, SoundManagerProgressDelegate
 	
 	func selectSound(url: URL) {
 		let optData = try? Data(contentsOf: url)
-		//let optSound = NSSound(contentsOf: url, byReference: false)
 		
 		guard let data = optData else {
+			print("No data :(")
 			return
 		}
 		
-		let optSound = NSSound(data: data)
+		let optSound = try? AVAudioPlayer(data: data)
 		
-		if let sound = optSound, let i = index {
+		guard let sound = optSound else {
+			print("No sound :(")
+			return
+		}
+
+		if let i = index {
+			sound.prepareToPlay()
 			print("Set the sound", sound.duration)
 			let clip = Clip(url: url, sound: sound)
 			SoundManager.defaultManager.setClipForIndex(i, clip: clip)
+			return
 		}
-			
-		else {
-			print("No sound :(")
-		}
+
+		print("No sound :(")
 	}
 	
 	func onClipProgress() {

@@ -20,6 +20,7 @@
 		A153B3001FCDCE6F0086FA19 /* ClipCollectionViewItem.swift in Sources */ = {isa = PBXBuildFile; fileRef = A153B2FE1FCDCE6F0086FA19 /* ClipCollectionViewItem.swift */; };
 		A153B3011FCDCE6F0086FA19 /* ClipCollectionViewItem.xib in Resources */ = {isa = PBXBuildFile; fileRef = A153B2FF1FCDCE6F0086FA19 /* ClipCollectionViewItem.xib */; };
 		A1A23E371FD0B46A00689C25 /* SoundManagerProgressDelegate.swift in Sources */ = {isa = PBXBuildFile; fileRef = A1A23E361FD0B46A00689C25 /* SoundManagerProgressDelegate.swift */; };
+		A1A91A29203B5F43008CCF52 /* AVFoundation.framework in Frameworks */ = {isa = PBXBuildFile; fileRef = A1A91A28203B5F43008CCF52 /* AVFoundation.framework */; };
 		A1C9963C1FCF685F009944A1 /* SoundManagerDelegate.swift in Sources */ = {isa = PBXBuildFile; fileRef = A1C9963B1FCF685F009944A1 /* SoundManagerDelegate.swift */; };
 /* End PBXBuildFile section */
 
@@ -74,6 +75,7 @@
 		A153B2FE1FCDCE6F0086FA19 /* ClipCollectionViewItem.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = ClipCollectionViewItem.swift; sourceTree = "<group>"; };
 		A153B2FF1FCDCE6F0086FA19 /* ClipCollectionViewItem.xib */ = {isa = PBXFileReference; lastKnownFileType = file.xib; path = ClipCollectionViewItem.xib; sourceTree = "<group>"; };
 		A1A23E361FD0B46A00689C25 /* SoundManagerProgressDelegate.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = SoundManagerProgressDelegate.swift; sourceTree = "<group>"; };
+		A1A91A28203B5F43008CCF52 /* AVFoundation.framework */ = {isa = PBXFileReference; lastKnownFileType = wrapper.framework; name = AVFoundation.framework; path = System/Library/Frameworks/AVFoundation.framework; sourceTree = SDKROOT; };
 		A1C9963B1FCF685F009944A1 /* SoundManagerDelegate.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = SoundManagerDelegate.swift; sourceTree = "<group>"; };
 		A5885DAD110F191057257DBC /* Pods-Clip Manager.release.xcconfig */ = {isa = PBXFileReference; includeInIndex = 1; lastKnownFileType = text.xcconfig; name = "Pods-Clip Manager.release.xcconfig"; path = "Pods/Target Support Files/Pods-Clip Manager/Pods-Clip Manager.release.xcconfig"; sourceTree = "<group>"; };
 		D00BA9ABB8E204202614FFAD /* Pods_Clip_Manager.framework */ = {isa = PBXFileReference; explicitFileType = wrapper.framework; includeInIndex = 0; path = Pods_Clip_Manager.framework; sourceTree = BUILT_PRODUCTS_DIR; };
@@ -84,6 +86,7 @@
 			isa = PBXFrameworksBuildPhase;
 			buildActionMask = 2147483647;
 			files = (
+				A1A91A29203B5F43008CCF52 /* AVFoundation.framework in Frameworks */,
 				A153B2EB1FCAB61F0086FA19 /* AudioToolbox.framework in Frameworks */,
 				48DDFA6AA5804C904BBD6035 /* Pods_Clip_Manager.framework in Frameworks */,
 			);
@@ -177,6 +180,7 @@
 		A153B2E91FCAB6190086FA19 /* Frameworks */ = {
 			isa = PBXGroup;
 			children = (
+				A1A91A28203B5F43008CCF52 /* AVFoundation.framework */,
 				A153B2EA1FCAB6190086FA19 /* AudioToolbox.framework */,
 				D00BA9ABB8E204202614FFAD /* Pods_Clip_Manager.framework */,
 			);
