@@ -84,7 +84,13 @@ class ClipCollectionViewItem: NSCollectionViewItem, SoundManagerProgressDelegate
 
 			if #available(OSX 10.13, *) {
 				if let deviceUid = theClip.sound.currentDevice {
-					audioPopUpButton.selectItem(withTitle: deviceUid)
+					if deviceUid == "AQDefaultOutput" {
+						audioPopUpButton.selectItem(withTitle: DEFAULT_DEVICE_LABEL)
+					}
+
+					else {
+						audioPopUpButton.selectItem(withTitle: deviceUid)
+					}
 				}
 
 				else {
