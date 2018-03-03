@@ -99,6 +99,11 @@ class SoundManager: NSObject, AVAudioPlayerDelegate {
 			if let uid = deviceUid {
 				if #available(OSX 10.13, *) {
 					clip.sound.currentDevice = uid
+					NSLog("Set sound %@ device to %@", clip.sound, clip.sound.currentDevice ?? "nil")
+
+					if clip.sound.currentDevice != uid {
+						NSLog("FAILED TO SET SOUND DEVICE")
+					}
 				} else {
 					// Fallback on earlier versions
 				}
@@ -358,4 +363,12 @@ class SoundManager: NSObject, AVAudioPlayerDelegate {
 		
 		return list
 	}
+
+	/*func exportClips() -> Dictionary<Int, Clip> {
+		// TODO
+	}
+
+	func importClips(_ data: Dictionary<Int, Clip>) {
+		// TODO
+	}*/
 }
