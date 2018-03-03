@@ -186,6 +186,10 @@ class SoundManager: NSObject, AVAudioPlayerDelegate {
 			clip.playing = true
 			notifyProgressForIndex(index)
 		}
+
+		else {
+			NSLog("Tried to play clip %d, but there was no such clip", index)
+		}
 	}
 	
 	func stopClipForIndex(_ index: Int) {
