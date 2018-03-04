@@ -95,25 +95,34 @@ class SoundManager: NSObject, AVAudioPlayerDelegate {
 	}
 	
 	func setDeviceForIndex(_ index: Int, deviceUid: String?) {
-		if let clip = clips[index] {
-			if let uid = deviceUid {
-				if #available(OSX 10.13, *) {
+		if #available(OSX 10.13, *) {
+			if let clip = clips[index] {
+				if let uid = deviceUid {
 					clip.sound.currentDevice = uid
 					NSLog("Set sound %@ device to %@", clip.sound, clip.sound.currentDevice ?? "nil")
 
 					if clip.sound.currentDevice != uid {
 						NSLog("FAILED TO SET SOUND DEVICE")
 					}
-				} else {
-					// Fallback on earlier versions
+				}
+
+				else {
+					clip.sound.currentDevice = nil
 				}
 			}
-			
-			else {
-				if #available(OSX 10.13, *) {
-					clip.sound.currentDevice = nil
-				} else {
-					// Fallback on earlier versions
+		}
+	}
+
+	func resetDeviceIfGoneForIndex(_ index: Int) {
+		if #available(OSX 10.13, *) {
+			if let clip = clips[index] {
+				let devices = outputDeviceIds()
+
+				if let device = clip.sound.currentDevice {
+					if !devices.contains(device) {
+						// It's gone. Reset.
+						clip.sound.currentDevice = nil
+					}
 				}
 			}
 		}

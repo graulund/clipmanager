@@ -8,14 +8,16 @@
 
 import Cocoa
 import AVFoundation
+import AMCoreAudio
 
 let DEFAULT_DEVICE_LABEL = "Default device"
 let ALMOST_DONE_SECONDS: TimeInterval = 10.0
 
 let progressColor = NSColor(white: 1.0, alpha: 1.0)
 let almostDoneColor = NSColor(red: 1.0, green: 0.933333, blue: 0.4, alpha: 1.0)
+let deviceColor = NSColor(red: 0.25, green: 0.25, blue: 1.0, alpha: 1.0)
 
-class ClipCollectionViewItem: NSCollectionViewItem, SoundManagerProgressDelegate {
+class ClipCollectionViewItem: NSCollectionViewItem, SoundManagerProgressDelegate, EventSubscriber {
 	@IBOutlet weak var numberField: NSTextField!
 	@IBOutlet weak var progressField: NSTextField!
 	@IBOutlet weak var audioPopUpButton: NSPopUpButton!
@@ -25,14 +27,18 @@ class ClipCollectionViewItem: NSCollectionViewItem, SoundManagerProgressDelegate
 	var clip: Clip? {
 		didSet {
 			guard isViewLoaded else { return }
-			updateDataView()
+			DispatchQueue.main.async {
+				self.updateDataView()
+			}
 		}
 	}
-	
+
 	var index: Int? {
 		didSet {
 			guard isViewLoaded else { return }
-			updateDataView()
+			DispatchQueue.main.async {
+				self.updateDataView()
+			}
 		}
 	}
 	
@@ -40,6 +46,9 @@ class ClipCollectionViewItem: NSCollectionViewItem, SoundManagerProgressDelegate
         super.viewDidLoad()
         // Do view setup here.
 		view.wantsLayer = true
+
+		// Register audio hardware change events
+		NotificationCenter.defaultCenter.subscribe(self, eventType: AudioHardwareEvent.self)
     }
 	
 	override func viewWillAppear() {
@@ -47,6 +56,11 @@ class ClipCollectionViewItem: NSCollectionViewItem, SoundManagerProgressDelegate
 		updateDataView()
 	}
 	
+	override func viewWillDisappear() {
+		// Unregister events when view disappears
+		NotificationCenter.defaultCenter.unsubscribe(self, eventType: AudioHardwareEvent.self)
+	}
+
 	func updateDataView() {
 		if let currentIndex = index {
 			numberField.stringValue = String(describing: 1 + currentIndex)
@@ -86,21 +100,25 @@ class ClipCollectionViewItem: NSCollectionViewItem, SoundManagerProgressDelegate
 				if let deviceUid = theClip.sound.currentDevice {
 					if deviceUid == "AQDefaultOutput" {
 						audioPopUpButton.selectItem(withTitle: DEFAULT_DEVICE_LABEL)
+						textField?.textColor = NSColor.labelColor
 					}
 
 					else {
 						audioPopUpButton.selectItem(withTitle: deviceUid)
+						textField?.textColor = deviceColor
 					}
 				}
 
 				else {
 					audioPopUpButton.selectItem(withTitle: DEFAULT_DEVICE_LABEL)
+					textField?.textColor = NSColor.labelColor
 				}
 			}
 		}
 			
 		else {
 			textField?.stringValue = ""
+			textField?.textColor = NSColor.labelColor
 			progressField.stringValue = ""
 			audioPopUpButton.isEnabled = false
 			progressBox.isHidden = true
@@ -112,13 +130,13 @@ class ClipCollectionViewItem: NSCollectionViewItem, SoundManagerProgressDelegate
 			if let value = audioPopUpButton.titleOfSelectedItem {
 				if value != DEFAULT_DEVICE_LABEL {
 					SoundManager.defaultManager.setDeviceForIndex(currentIndex, deviceUid: value)
-					audioPopUpButton.setTitle(value)
+					updateDataView()
 					return
 				}
 			}
 			
 			SoundManager.defaultManager.setDeviceForIndex(currentIndex, deviceUid: nil)
-			audioPopUpButton.setTitle(DEFAULT_DEVICE_LABEL)
+			updateDataView()
 		}
 	}
 	
@@ -172,6 +190,26 @@ class ClipCollectionViewItem: NSCollectionViewItem, SoundManagerProgressDelegate
 		updateDataView()
 	}
 	
+	// Events
+
+	func eventReceiver(_ event: Event) {
+		if let evt = event as? AudioHardwareEvent {
+			switch evt {
+			case .deviceListChanged(_, _):
+				NSLog("Device list changed")
+				DispatchQueue.main.async {
+					if let index = self.index {
+						SoundManager.defaultManager.resetDeviceIfGoneForIndex(index)
+					}
+					self.updateDataView()
+				}
+			default:
+				NSLog("Received an audio hardware event")
+			}
+
+		}
+	}
+
 	// Time tools
 	
 	func formatTime(seconds: Int) -> [String: Int] {
