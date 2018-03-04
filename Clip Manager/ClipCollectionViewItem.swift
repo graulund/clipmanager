@@ -161,29 +161,9 @@ class ClipCollectionViewItem: NSCollectionViewItem, SoundManagerProgressDelegate
 	}
 	
 	func selectSound(url: URL) {
-		let optData = try? Data(contentsOf: url)
-		
-		guard let data = optData else {
-			print("No data :(")
-			return
-		}
-		
-		let optSound = try? AVAudioPlayer(data: data)
-		
-		guard let sound = optSound else {
-			print("No sound :(")
-			return
-		}
-
 		if let i = index {
-			sound.prepareToPlay()
-			print("Set the sound", sound.duration)
-			let clip = Clip(url: url, sound: sound)
-			SoundManager.defaultManager.setClipForIndex(i, clip: clip)
-			return
+			SoundManager.defaultManager.setClipByURLForIndex(i, url: url)
 		}
-
-		print("No sound :(")
 	}
 	
 	func onClipProgress() {

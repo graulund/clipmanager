@@ -94,6 +94,28 @@ class SoundManager: NSObject, AVAudioPlayerDelegate {
 		clipsChanged()
 	}
 	
+	func setClipByURLForIndex(_ index: Int, url: URL) {
+		let optData = try? Data(contentsOf: url)
+
+		guard let data = optData else {
+			print("No data :(")
+			return
+		}
+
+		let optSound = try? AVAudioPlayer(data: data)
+
+		guard let sound = optSound else {
+			print("No sound :(")
+			return
+		}
+
+		sound.prepareToPlay()
+		print("Set the sound", sound.duration)
+		let clip = Clip(url: url, sound: sound)
+		setClipForIndex(index, clip: clip)
+		return
+	}
+
 	func setDeviceForIndex(_ index: Int, deviceUid: String?) {
 		if #available(OSX 10.13, *) {
 			if let clip = clips[index] {
@@ -175,7 +197,7 @@ class SoundManager: NSObject, AVAudioPlayerDelegate {
 	
 	func findIndexForSound(_ sound: AVAudioPlayer) -> Int? {
 		for (index, thisClip) in clips {
-			if (thisClip.sound == sound) {
+			if thisClip.sound == sound {
 				return index
 			}
 		}
@@ -352,12 +374,12 @@ class SoundManager: NSObject, AVAudioPlayerDelegate {
 		for i in 0..<destCount {
 			let dest = MIDIGetDestination(i)
 			var endpointName: Unmanaged<CFString>?
-			
+
 			CheckError(
 				MIDIObjectGetStringProperty(dest, kMIDIPropertyName, &endpointName),
 				"Couldn't get endpoint name"
 			)
-			
+
 			print("  dest \(i): \(endpointName!.takeRetainedValue() as String)")
 			outEndpoint = dest
 		}
@@ -365,23 +387,54 @@ class SoundManager: NSObject, AVAudioPlayerDelegate {
 	
 	func outputDeviceIds() -> [String] {
 		let devices = AudioDevice.allOutputDevices()
-		
+
 		var list = [String]()
-		
+
 		for device in devices {
 			if let uid = device.uid {
 				list.append(uid)
 			}
 		}
-		
+
 		return list
 	}
 
-	/*func exportClips() -> Dictionary<Int, Clip> {
-		// TODO
+	func exportClips() -> [Int: [String: String?]] {
+		var d: [Int: [String: String?]] = [:]
+
+		for (index, clip) in clips {
+			if #available(OSX 10.13, *) {
+				d[index] = [
+					"file": clip.url.absoluteString,
+					"device": clip.sound.currentDevice
+				]
+			} else {
+				d[index] = [
+					"file": clip.url.absoluteString,
+					"device": nil
+				]
+			}
+		}
+
+		return d
 	}
 
-	func importClips(_ data: Dictionary<Int, Clip>) {
-		// TODO
-	}*/
+	func importClips(_ data: [Int: [String: String?]]) {
+		self.clips = [:]
+		for (index, clipData) in data {
+			if let filePath = clipData["file"] {
+				if let path = filePath {
+					setClipByURLForIndex(index, url: URL(fileURLWithPath: path))
+
+					if #available(OSX 10.13, *) {
+						if let device = clipData["device"] {
+							if let clip = self.clips[index] {
+								clip.sound.currentDevice = device
+							}
+						}
+					}
+				}
+			}
+		}
+	}
 }
