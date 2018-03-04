@@ -11,18 +11,18 @@ import Cocoa
 class ViewController: NSViewController, NSCollectionViewDelegate, NSCollectionViewDataSource, NSCollectionViewDelegateFlowLayout, SoundManagerDelegate {
 
 	@IBOutlet weak var collectionView: NSCollectionView!
-	
+
 	override func viewDidLoad() {
 		super.viewDidLoad()
 
 		// Stay on top of clips
 		SoundManager.defaultManager.delegate = self
 	}
-	
+
 	// This method will be called everytime window is resized
 	override func viewWillLayout() {
 		super.viewWillLayout()
-		
+
 		// When we're invalidating the collection view layout
 		// it will call `collectionView(_:layout:sizeForItemAt:)` method
 		collectionView.collectionViewLayout?.invalidateLayout()
@@ -33,37 +33,37 @@ class ViewController: NSViewController, NSCollectionViewDelegate, NSCollectionVi
 		// Update the view, if already loaded.
 		}
 	}
-	
+
 	func numberOfSections(in collectionView: NSCollectionView) -> Int {
 		return 1
 	}
-	
+
 	func collectionView(_ collectionView: NSCollectionView, numberOfItemsInSection section: Int) -> Int {
 		return 8 // TODO
 	}
-	
+
 	func collectionView(_ collectionView: NSCollectionView, itemForRepresentedObjectAt indexPath: IndexPath) -> NSCollectionViewItem {
 		let item = collectionView.makeItem(
 			withIdentifier: NSUserInterfaceItemIdentifier(rawValue: "ClipCollectionViewItem"),
 			for: indexPath
 		)
 		guard let collectionViewItem = item as? ClipCollectionViewItem else { return item }
-		
+
 		let index = indexPath[indexPath.endIndex - 1]
 		let clip = SoundManager.defaultManager.getClipForIndex(index)
-		
+
 		if collectionViewItem.index != index {
 			collectionViewItem.index = index
 			SoundManager.defaultManager.setProgressDelegateForIndex(index, delegate: collectionViewItem)
 		}
-		
+
 		if collectionViewItem.clip !== clip {
 			collectionViewItem.clip = clip
 		}
-		
+
 		return item
 	}
-	
+
 	func collectionView(
 		_ collectionView: NSCollectionView,
 		layout collectionViewLayout: NSCollectionViewLayout,
@@ -74,7 +74,7 @@ class ViewController: NSViewController, NSCollectionViewDelegate, NSCollectionVi
 		// and height equals to 70
 		return CGSize(width: collectionView.bounds.width, height: 70)
 	}
-	
+
 	func onClipsChanged() {
 		self.collectionView.reloadData()
 	}

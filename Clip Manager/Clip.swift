@@ -13,9 +13,9 @@ class Clip: NSObject {
 	var name: String
 	var url: URL
 	var sound: AVAudioPlayer
-	
+
 	var playing = false
-	
+
 	init(url: URL, sound: AVAudioPlayer) {
 		self.name = url.lastPathComponent
 		self.url = url

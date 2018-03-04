@@ -23,7 +23,7 @@ class ClipCollectionViewItem: NSCollectionViewItem, SoundManagerProgressDelegate
 	@IBOutlet weak var audioPopUpButton: NSPopUpButton!
 	@IBOutlet weak var progressBox: NSBox!
 	@IBOutlet weak var progressBoxWidth: NSLayoutConstraint!
-	
+
 	var clip: Clip? {
 		didSet {
 			guard isViewLoaded else { return }
@@ -41,21 +41,21 @@ class ClipCollectionViewItem: NSCollectionViewItem, SoundManagerProgressDelegate
 			}
 		}
 	}
-	
+
 	override func viewDidLoad() {
-        super.viewDidLoad()
-        // Do view setup here.
+		super.viewDidLoad()
+		// Do view setup here.
 		view.wantsLayer = true
 
 		// Register audio hardware change events
 		NotificationCenter.defaultCenter.subscribe(self, eventType: AudioHardwareEvent.self)
-    }
-	
+	}
+
 	override func viewWillAppear() {
 		super.viewWillAppear()
 		updateDataView()
 	}
-	
+
 	override func viewWillDisappear() {
 		// Unregister events when view disappears
 		NotificationCenter.defaultCenter.unsubscribe(self, eventType: AudioHardwareEvent.self)
@@ -65,7 +65,7 @@ class ClipCollectionViewItem: NSCollectionViewItem, SoundManagerProgressDelegate
 		if let currentIndex = index {
 			numberField.stringValue = String(describing: 1 + currentIndex)
 		}
-		
+
 		audioPopUpButton.removeAllItems()
 		audioPopUpButton.addItem(withTitle: DEFAULT_DEVICE_LABEL)
 		audioPopUpButton.addItems(withTitles: SoundManager.defaultManager.outputDeviceIds())
@@ -115,7 +115,7 @@ class ClipCollectionViewItem: NSCollectionViewItem, SoundManagerProgressDelegate
 				}
 			}
 		}
-			
+
 		else {
 			textField?.stringValue = ""
 			textField?.textColor = NSColor.labelColor
@@ -124,7 +124,7 @@ class ClipCollectionViewItem: NSCollectionViewItem, SoundManagerProgressDelegate
 			progressBox.isHidden = true
 		}
 	}
-	
+
 	@IBAction func audioPopUpClick(_ sender: Any) {
 		if let currentIndex = index {
 			if let value = audioPopUpButton.titleOfSelectedItem {
@@ -134,15 +134,15 @@ class ClipCollectionViewItem: NSCollectionViewItem, SoundManagerProgressDelegate
 					return
 				}
 			}
-			
+
 			SoundManager.defaultManager.setDeviceForIndex(currentIndex, deviceUid: nil)
 			updateDataView()
 		}
 	}
-	
+
 	@IBAction func fileSelectClick(_ sender: Any) {
 		let dialog = NSOpenPanel()
-		
+
 		dialog.title                   = "Choose an audio file"
 		dialog.showsResizeIndicator    = true
 		dialog.showsHiddenFiles        = false
@@ -150,26 +150,26 @@ class ClipCollectionViewItem: NSCollectionViewItem, SoundManagerProgressDelegate
 		dialog.canCreateDirectories    = true
 		dialog.allowsMultipleSelection = false
 		dialog.allowedFileTypes        = ["mp3", "wav", "aiff", "aac", "m4a", "caf"]
-		
+
 		if dialog.runModal() == NSApplication.ModalResponse.OK {
 			let optResult = dialog.url // Pathname of the file
-			
+
 			if let result = optResult {
 				self.selectSound(url: result)
 			}
 		}
 	}
-	
+
 	func selectSound(url: URL) {
 		if let i = index {
 			SoundManager.defaultManager.setClipByURLForIndex(i, url: url)
 		}
 	}
-	
+
 	func onClipProgress() {
 		updateDataView()
 	}
-	
+
 	// Events
 
 	func eventReceiver(_ event: Event) {
@@ -191,7 +191,7 @@ class ClipCollectionViewItem: NSCollectionViewItem, SoundManagerProgressDelegate
 	}
 
 	// Time tools
-	
+
 	func formatTime(seconds: Int) -> [String: Int] {
 		var s = seconds
 		let hours = s / 3600
@@ -200,10 +200,10 @@ class ClipCollectionViewItem: NSCollectionViewItem, SoundManagerProgressDelegate
 		s = s % 60
 		return ["hours": hours, "minutes": minutes, "seconds": s]
 	}
-	
+
 	func secondsToLength(seconds: Int) -> String {
 		var t = self.formatTime(seconds: seconds)
-		
+
 		if let secs = t["seconds"] {
 			let minutes = t["minutes"] != nil ? t["minutes"]! : 0
 			if let hours = t["hours"] {
@@ -213,7 +213,7 @@ class ClipCollectionViewItem: NSCollectionViewItem, SoundManagerProgressDelegate
 			}
 			return String(format: "\(minutes):%02d", secs)
 		}
-		
+
 		return ""
 	}
 }
