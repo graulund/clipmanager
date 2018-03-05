@@ -71,7 +71,7 @@ class ClipCollectionViewItem: NSCollectionViewItem, SoundManagerProgressDelegate
 		audioPopUpButton.addItems(withTitles: SoundManager.default.outputDeviceIds())
 
 		if let theClip = clip {
-			textField?.stringValue = theClip.name
+			textField?.stringValue = "\(theClip.name) (\(self.secondsToLength(seconds: Int(round(theClip.sound.duration)))))"
 
 			if theClip.playing {
 				let secsLeft = max(0.0, theClip.sound.duration - theClip.sound.currentTime)
