@@ -21,7 +21,7 @@ class AppDelegate: NSObject, NSApplicationDelegate {
 
 		for index in 0..<SoundManager.default.numClips {
 			let number = index + 1
-			let item = NSMenuItem.init(title: "Play item " + String(number), action: #selector(playItemClick), keyEquivalent: String(number))
+			let item = NSMenuItem.init(title: "Play Item " + String(number), action: #selector(playItemClick), keyEquivalent: String(number))
 			playMenu.addItem(item)
 		}
 	}
