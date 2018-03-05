@@ -106,8 +106,8 @@ class AppDelegate: NSObject, NSApplicationDelegate {
 		let response = alert.runModal()
 
 		if response == SaveResponse {
-			SoundManager.default.listIsDirty = false
 			saveListMenuItemClick(self)
+			SoundManager.default.listIsDirty = false
 			return true
 		}
 
