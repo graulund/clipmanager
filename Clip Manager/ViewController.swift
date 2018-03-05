@@ -16,7 +16,7 @@ class ViewController: NSViewController, NSCollectionViewDelegate, NSCollectionVi
 		super.viewDidLoad()
 
 		// Stay on top of clips
-		SoundManager.defaultManager.delegate = self
+		SoundManager.default.delegate = self
 	}
 
 	// This method will be called everytime window is resized
@@ -39,7 +39,7 @@ class ViewController: NSViewController, NSCollectionViewDelegate, NSCollectionVi
 	}
 
 	func collectionView(_ collectionView: NSCollectionView, numberOfItemsInSection section: Int) -> Int {
-		return 8 // TODO
+		return SoundManager.default.numClips
 	}
 
 	func collectionView(_ collectionView: NSCollectionView, itemForRepresentedObjectAt indexPath: IndexPath) -> NSCollectionViewItem {
@@ -50,11 +50,11 @@ class ViewController: NSViewController, NSCollectionViewDelegate, NSCollectionVi
 		guard let collectionViewItem = item as? ClipCollectionViewItem else { return item }
 
 		let index = indexPath[indexPath.endIndex - 1]
-		let clip = SoundManager.defaultManager.getClipForIndex(index)
+		let clip = SoundManager.default.getClipForIndex(index)
 
 		if collectionViewItem.index != index {
 			collectionViewItem.index = index
-			SoundManager.defaultManager.setProgressDelegateForIndex(index, delegate: collectionViewItem)
+			SoundManager.default.setProgressDelegateForIndex(index, delegate: collectionViewItem)
 		}
 
 		if collectionViewItem.clip !== clip {

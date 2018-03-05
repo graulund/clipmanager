@@ -68,11 +68,10 @@ class ClipCollectionViewItem: NSCollectionViewItem, SoundManagerProgressDelegate
 
 		audioPopUpButton.removeAllItems()
 		audioPopUpButton.addItem(withTitle: DEFAULT_DEVICE_LABEL)
-		audioPopUpButton.addItems(withTitles: SoundManager.defaultManager.outputDeviceIds())
+		audioPopUpButton.addItems(withTitles: SoundManager.default.outputDeviceIds())
 
 		if let theClip = clip {
 			textField?.stringValue = theClip.name
-			audioPopUpButton.isEnabled = true
 
 			if theClip.playing {
 				let secsLeft = max(0.0, theClip.sound.duration - theClip.sound.currentTime)
@@ -97,6 +96,8 @@ class ClipCollectionViewItem: NSCollectionViewItem, SoundManagerProgressDelegate
 			}
 
 			if #available(OSX 10.13, *) {
+				audioPopUpButton.isEnabled = true
+
 				if let deviceUid = theClip.sound.currentDevice {
 					if deviceUid == "AQDefaultOutput" {
 						audioPopUpButton.selectItem(withTitle: DEFAULT_DEVICE_LABEL)
@@ -114,6 +115,10 @@ class ClipCollectionViewItem: NSCollectionViewItem, SoundManagerProgressDelegate
 					textField?.textColor = NSColor.labelColor
 				}
 			}
+
+			else {
+				audioPopUpButton.isEnabled = false
+			}
 		}
 
 		else {
@@ -129,13 +134,13 @@ class ClipCollectionViewItem: NSCollectionViewItem, SoundManagerProgressDelegate
 		if let currentIndex = index {
 			if let value = audioPopUpButton.titleOfSelectedItem {
 				if value != DEFAULT_DEVICE_LABEL {
-					SoundManager.defaultManager.setDeviceForIndex(currentIndex, deviceUid: value)
+					SoundManager.default.setDeviceForIndex(currentIndex, deviceUid: value)
 					updateDataView()
 					return
 				}
 			}
 
-			SoundManager.defaultManager.setDeviceForIndex(currentIndex, deviceUid: nil)
+			SoundManager.default.setDeviceForIndex(currentIndex, deviceUid: nil)
 			updateDataView()
 		}
 	}
@@ -162,7 +167,7 @@ class ClipCollectionViewItem: NSCollectionViewItem, SoundManagerProgressDelegate
 
 	func selectSound(url: URL) {
 		if let i = index {
-			SoundManager.defaultManager.setClipByURLForIndex(i, url: url)
+			SoundManager.default.setClipByURLForIndex(i, url: url)
 		}
 	}
 
@@ -179,7 +184,7 @@ class ClipCollectionViewItem: NSCollectionViewItem, SoundManagerProgressDelegate
 				NSLog("Device list changed")
 				DispatchQueue.main.async {
 					if let index = self.index {
-						SoundManager.defaultManager.resetDeviceIfGoneForIndex(index)
+						SoundManager.default.resetDeviceIfGoneForIndex(index)
 					}
 					self.updateDataView()
 				}

@@ -60,7 +60,9 @@ func CheckError(_ error: OSStatus, _ operation: String) {
 }
 
 class SoundManager: NSObject, AVAudioPlayerDelegate {
-	static let defaultManager = SoundManager()
+	static let `default` = SoundManager()
+
+	let numClips = 8
 
 	var outPort = MIDIPortRef()
 	var outEndpoint = MIDIEndpointRef()
@@ -68,6 +70,9 @@ class SoundManager: NSObject, AVAudioPlayerDelegate {
 	var clips = Dictionary<Int, Clip>()
 	private var timers = Dictionary<Int, Timer>()
 	private var progressDelegates = Dictionary<Int, SoundManagerProgressDelegate>()
+
+	var listIsDirty = false
+	var listFilePath: URL?
 
 	var delegate: SoundManagerDelegate?
 
@@ -91,6 +96,7 @@ class SoundManager: NSObject, AVAudioPlayerDelegate {
 		clip.sound.delegate = self
 		NSLog("Set sound %@ to index %d, duration %f", clip.sound, index, clip.sound.duration)
 		clips[index] = clip
+		listIsDirty = true
 		clipsChanged()
 	}
 
@@ -227,6 +233,12 @@ class SoundManager: NSObject, AVAudioPlayerDelegate {
 		if let clip = clips[index] {
 			clip.sound.pause()
 			killSoundTimerForIndex(index)
+		}
+	}
+
+	func stopAllClips() {
+		for index in clips.keys {
+			stopClipForIndex(index)
 		}
 	}
 
@@ -399,17 +411,18 @@ class SoundManager: NSObject, AVAudioPlayerDelegate {
 		return list
 	}
 
-	func exportClips() -> [Int: [String: String?]] {
-		var d: [Int: [String: String?]] = [:]
+	func exportClips() -> [String: [String: String?]] {
+		var d: [String: [String: String?]] = [:]
 
 		for (index, clip) in clips {
+			let indexString = String(index)
 			if #available(OSX 10.13, *) {
-				d[index] = [
+				d[indexString] = [
 					"file": clip.url.absoluteString,
 					"device": clip.sound.currentDevice
 				]
 			} else {
-				d[index] = [
+				d[indexString] = [
 					"file": clip.url.absoluteString,
 					"device": nil
 				]
@@ -419,22 +432,39 @@ class SoundManager: NSObject, AVAudioPlayerDelegate {
 		return d
 	}
 
-	func importClips(_ data: [Int: [String: String?]]) {
-		self.clips = [:]
-		for (index, clipData) in data {
-			if let filePath = clipData["file"] {
-				if let path = filePath {
-					setClipByURLForIndex(index, url: URL(fileURLWithPath: path))
+	func importClips(_ data: [String: [String: String?]]) {
+		clearClips()
 
-					if #available(OSX 10.13, *) {
-						if let device = clipData["device"] {
-							if let clip = self.clips[index] {
-								clip.sound.currentDevice = device
+		for (indexString, clipData) in data {
+			if let index = Int(indexString) {
+				if index >= 0 {
+					if let filePath = clipData["file"] {
+						if let path = filePath {
+							if let url = URL(string: path) {
+								setClipByURLForIndex(index, url: url)
+
+								if #available(OSX 10.13, *) {
+									if let device = clipData["device"] {
+										if let clip = self.clips[index] {
+											clip.sound.currentDevice = device
+										}
+									}
+								}
 							}
 						}
 					}
 				}
 			}
 		}
+
+		listIsDirty = false
+		clipsChanged()
+	}
+
+	func clearClips() {
+		stopAllClips()
+		clips = [:]
+		listIsDirty = false
+		clipsChanged()
 	}
 }
