@@ -49,6 +49,8 @@ class ViewController: NSViewController, NSCollectionViewDelegate, NSCollectionVi
 		)
 		guard let collectionViewItem = item as? ClipCollectionViewItem else { return item }
 
+		SoundManager.default.removeProgressDelegate(collectionViewItem)
+
 		let index = indexPath[indexPath.endIndex - 1]
 		let clip = SoundManager.default.getClipForIndex(index)
 

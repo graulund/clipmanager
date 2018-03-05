@@ -264,6 +264,14 @@ class SoundManager: NSObject, AVAudioPlayerDelegate {
 		progressDelegates[index] = delegate
 	}
 
+	func removeProgressDelegate(_ delegate: SoundManagerProgressDelegate) {
+		for (index, thisDelegate) in progressDelegates {
+			if thisDelegate as AnyObject === delegate as AnyObject {
+				progressDelegates[index] = nil
+			}
+		}
+	}
+
 	func clipIndexForNote(_ note: Int) -> Int? {
 		return clipIndices[note]
 	}
