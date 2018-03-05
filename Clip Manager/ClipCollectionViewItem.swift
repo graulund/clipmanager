@@ -75,7 +75,15 @@ class ClipCollectionViewItem: NSCollectionViewItem, NSDraggingDestination, Sound
 		audioPopUpButton.addItems(withTitles: SoundManager.default.outputDeviceIds())
 
 		if let theClip = clip {
-			textField?.stringValue = "\(theClip.name) (\(self.secondsToLength(seconds: Int(round(theClip.sound.duration)))))"
+			let rawClipString = "\(theClip.name) \(self.secondsToLength(seconds: Int(round(theClip.sound.duration))))"
+
+			let clipString = NSMutableAttributedString(string: rawClipString)
+			clipString.addAttribute(NSAttributedStringKey.foregroundColor, value: NSColor.controlShadowColor, range: NSMakeRange(theClip.name.unicodeScalars.count, rawClipString.unicodeScalars.count - theClip.name.unicodeScalars.count))
+
+			textField?.attributedStringValue = clipString
+
+			let customDeviceString = NSMutableAttributedString(attributedString: clipString)
+			customDeviceString.addAttribute(NSAttributedStringKey.foregroundColor, value: deviceColor, range: NSMakeRange(0, theClip.name.unicodeScalars.count))
 
 			if theClip.playing {
 				let secsLeft = max(0.0, theClip.sound.duration - theClip.sound.currentTime)
@@ -105,18 +113,18 @@ class ClipCollectionViewItem: NSCollectionViewItem, NSDraggingDestination, Sound
 				if let deviceUid = theClip.sound.currentDevice {
 					if deviceUid == "AQDefaultOutput" {
 						audioPopUpButton.selectItem(withTitle: DEFAULT_DEVICE_LABEL)
-						textField?.textColor = NSColor.labelColor
+						textField?.attributedStringValue = clipString
 					}
 
 					else {
 						audioPopUpButton.selectItem(withTitle: deviceUid)
-						textField?.textColor = deviceColor
+						textField?.attributedStringValue = customDeviceString
 					}
 				}
 
 				else {
 					audioPopUpButton.selectItem(withTitle: DEFAULT_DEVICE_LABEL)
-					textField?.textColor = NSColor.labelColor
+					textField?.attributedStringValue = clipString
 				}
 			}
 
@@ -127,7 +135,6 @@ class ClipCollectionViewItem: NSCollectionViewItem, NSDraggingDestination, Sound
 
 		else {
 			textField?.stringValue = ""
-			textField?.textColor = NSColor.labelColor
 			progressField.stringValue = ""
 			audioPopUpButton.isEnabled = false
 			progressBox.isHidden = true
