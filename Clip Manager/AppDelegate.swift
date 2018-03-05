@@ -144,7 +144,7 @@ class AppDelegate: NSObject, NSApplicationDelegate {
 			}
 		}
 	}
-	
+
 	@IBAction func saveListMenuItemClick(_ sender: Any) {
 		if !SoundManager.default.listIsDirty {
 			return
