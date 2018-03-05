@@ -316,9 +316,9 @@
                                     </items>
                                 </menu>
                             </menuItem>
-                            <menuItem title="Play" id="jxT-CU-nIS">
+                            <menuItem title="Clips" id="jxT-CU-nIS">
                                 <modifierMask key="keyEquivalentModifierMask"/>
-                                <menu key="submenu" title="Play" id="GEO-Iw-cKr"/>
+                                <menu key="submenu" title="Clips" id="GEO-Iw-cKr"/>
                             </menuItem>
                             <menuItem title="View" id="H8h-7b-M4v">
                                 <modifierMask key="keyEquivalentModifierMask"/>
@@ -397,8 +397,8 @@
                 </application>
                 <customObject id="Voe-Tx-rLC" customClass="AppDelegate" customModule="Clip_Manager" customModuleProvider="target">
                     <connections>
+                        <outlet property="clipsMenu" destination="GEO-Iw-cKr" id="RK1-d1-NzR"/>
                         <outlet property="newListMenuItem" destination="Was-JA-tGl" id="i0N-oK-5in"/>
-                        <outlet property="playMenu" destination="GEO-Iw-cKr" id="ht9-jA-kSe"/>
                     </connections>
                 </customObject>
                 <customObject id="YLy-65-1bz" customClass="NSFontManager"/>

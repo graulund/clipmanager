@@ -146,28 +146,10 @@ class ClipCollectionViewItem: NSCollectionViewItem, SoundManagerProgressDelegate
 	}
 
 	@IBAction func fileSelectClick(_ sender: Any) {
-		let dialog = NSOpenPanel()
-
-		dialog.title                   = "Choose an audio file"
-		dialog.showsResizeIndicator    = true
-		dialog.showsHiddenFiles        = false
-		dialog.canChooseDirectories    = false
-		dialog.canCreateDirectories    = true
-		dialog.allowsMultipleSelection = false
-		dialog.allowedFileTypes        = ["mp3", "wav", "aiff", "aac", "m4a", "caf"]
-
-		if dialog.runModal() == NSApplication.ModalResponse.OK {
-			let optResult = dialog.url // Pathname of the file
-
-			if let result = optResult {
-				self.selectSound(url: result)
-			}
-		}
-	}
-
-	func selectSound(url: URL) {
 		if let i = index {
-			SoundManager.default.setClipByURLForIndex(i, url: url)
+			if let appDelegate = NSApplication.shared.delegate as? AppDelegate {
+				appDelegate.openAudioFileForIndex(i)
+			}
 		}
 	}
 

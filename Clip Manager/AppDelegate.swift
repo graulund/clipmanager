@@ -14,15 +14,35 @@ let DontSaveResponse = NSApplication.ModalResponse.alertSecondButtonReturn
 
 @NSApplicationMain
 class AppDelegate: NSObject, NSApplicationDelegate {
-	@IBOutlet weak var playMenu: NSMenu!
+	@IBOutlet weak var clipsMenu: NSMenu!
 
 	func applicationDidFinishLaunching(_ aNotification: Notification) {
 		NSLog("Starting SoundManager: %@", SoundManager.default)
 
 		for index in 0..<SoundManager.default.numClips {
 			let number = index + 1
-			let item = NSMenuItem.init(title: "Play Item " + String(number), action: #selector(playItemClick), keyEquivalent: String(number))
-			playMenu.addItem(item)
+
+			// Play clip item
+			let playItem = NSMenuItem.init(
+				title: "Play Clip " + String(number),
+				action: #selector(playItemClick),
+				keyEquivalent: String(number)
+			)
+			// No modifier
+			playItem.keyEquivalentModifierMask = NSEvent.ModifierFlags.init(rawValue: 0)
+
+			clipsMenu.addItem(playItem)
+
+			// Replace clip item
+			let replaceItem = NSMenuItem.init(
+				title: "Replace Clip " + String(number),
+				action: #selector(replaceItemClick),
+				keyEquivalent: String(number)
+			)
+			// Command and shift
+			replaceItem.keyEquivalentModifierMask = NSEvent.ModifierFlags(rawValue: NSEvent.ModifierFlags.RawValue(UInt(NSEvent.ModifierFlags.command.rawValue) | UInt(NSEvent.ModifierFlags.shift.rawValue)))
+
+			clipsMenu.addItem(replaceItem)
 		}
 	}
 
@@ -40,15 +60,6 @@ class AppDelegate: NSObject, NSApplicationDelegate {
 		}
 
 		return .terminateCancel
-	}
-
-	@objc func playItemClick(sender: Any, forEvent event: NSEvent) {
-		if let item = sender as? NSMenuItem {
-			if let number = Int(item.keyEquivalent) {
-				let index = number - 1
-				SoundManager.default.toggleClipForIndex(index)
-			}
-		}
 	}
 
 	func openListFromFilePath(_ filePath: URL) -> [String: [String: String?]]? {
@@ -117,6 +128,44 @@ class AppDelegate: NSObject, NSApplicationDelegate {
 		}
 
 		return false
+	}
+
+	func openAudioFileForIndex(_ index: Int) {
+		let dialog = NSOpenPanel()
+
+		dialog.title                   = "Choose an Audio File"
+		dialog.showsResizeIndicator    = true
+		dialog.showsHiddenFiles        = false
+		dialog.canChooseDirectories    = false
+		dialog.canCreateDirectories    = true
+		dialog.allowsMultipleSelection = false
+		dialog.allowedFileTypes        = ["mp3", "wav", "aiff", "aac", "m4a", "caf"]
+
+		if dialog.runModal() == NSApplication.ModalResponse.OK {
+			let result = dialog.url // Pathname of the file
+
+			if let url = result {
+				SoundManager.default.setClipByURLForIndex(index, url: url)
+			}
+		}
+	}
+
+	@objc func playItemClick(_ sender: Any, forEvent event: NSEvent) {
+		if let item = sender as? NSMenuItem {
+			if let number = Int(item.keyEquivalent) {
+				let index = number - 1
+				SoundManager.default.toggleClipForIndex(index)
+			}
+		}
+	}
+
+	@objc func replaceItemClick(_ sender: Any, forEvent event: NSEvent) {
+		if let item = sender as? NSMenuItem {
+			if let number = Int(item.keyEquivalent) {
+				let index = number - 1
+				openAudioFileForIndex(index)
+			}
+		}
 	}
 
 	@IBAction func newListMenuItemClick(_ sender: Any) {
