@@ -30,6 +30,18 @@ class AppDelegate: NSObject, NSApplicationDelegate {
 		// Insert code here to tear down your application
 	}
 
+	func applicationShouldTerminateAfterLastWindowClosed(_ sender: NSApplication) -> Bool {
+		return true
+	}
+
+	func applicationShouldTerminate(_ sender: NSApplication) -> NSApplication.TerminateReply {
+		if confirmBeforeLeavingUnsaved(title: "Closing Clip Manager") {
+			return .terminateNow
+		}
+
+		return .terminateCancel
+	}
+
 	@objc func playItemClick(sender: Any, forEvent event: NSEvent) {
 		if let item = sender as? NSMenuItem {
 			if let number = Int(item.keyEquivalent) {

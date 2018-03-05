@@ -71,8 +71,17 @@ class SoundManager: NSObject, AVAudioPlayerDelegate {
 	private var timers = Dictionary<Int, Timer>()
 	private var progressDelegates = Dictionary<Int, SoundManagerProgressDelegate>()
 
-	var listIsDirty = false
 	var listFilePath: URL?
+
+	var listIsDirty = false {
+		didSet {
+			if let delg = delegate {
+				DispatchQueue.main.async {
+					delg.onDirtyStatusChanged()
+				}
+			}
+		}
+	}
 
 	var delegate: SoundManagerDelegate?
 

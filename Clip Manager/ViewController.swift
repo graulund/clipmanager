@@ -80,5 +80,9 @@ class ViewController: NSViewController, NSCollectionViewDelegate, NSCollectionVi
 	func onClipsChanged() {
 		self.collectionView.reloadData()
 	}
+
+	func onDirtyStatusChanged() {
+		self.view.window?.isDocumentEdited = SoundManager.default.listIsDirty
+	}
 }
 

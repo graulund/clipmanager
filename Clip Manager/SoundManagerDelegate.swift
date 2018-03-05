@@ -10,4 +10,5 @@ import Foundation
 
 protocol SoundManagerDelegate {
 	func onClipsChanged()
+	func onDirtyStatusChanged()
 }
