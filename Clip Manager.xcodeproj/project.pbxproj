@@ -8,6 +8,7 @@
 
 /* Begin PBXBuildFile section */
 		12EB8F01204D6A6000A74B7D /* WindowController.swift in Sources */ = {isa = PBXBuildFile; fileRef = 12EB8F00204D6A6000A74B7D /* WindowController.swift */; };
+		12EB8F03204D756000A74B7D /* ClipCollectionViewItemView.swift in Sources */ = {isa = PBXBuildFile; fileRef = 12EB8F02204D756000A74B7D /* ClipCollectionViewItemView.swift */; };
 		48DDFA6AA5804C904BBD6035 /* Pods_Clip_Manager.framework in Frameworks */ = {isa = PBXBuildFile; fileRef = D00BA9ABB8E204202614FFAD /* Pods_Clip_Manager.framework */; };
 		A153B2A21FC830B10086FA19 /* AppDelegate.swift in Sources */ = {isa = PBXBuildFile; fileRef = A153B2A11FC830B10086FA19 /* AppDelegate.swift */; };
 		A153B2A41FC830B10086FA19 /* ViewController.swift in Sources */ = {isa = PBXBuildFile; fileRef = A153B2A31FC830B10086FA19 /* ViewController.swift */; };
@@ -57,6 +58,7 @@
 
 /* Begin PBXFileReference section */
 		12EB8F00204D6A6000A74B7D /* WindowController.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = WindowController.swift; sourceTree = "<group>"; };
+		12EB8F02204D756000A74B7D /* ClipCollectionViewItemView.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = ClipCollectionViewItemView.swift; sourceTree = "<group>"; };
 		81ADBC233EFC111E94B66911 /* Pods-Clip Manager.debug.xcconfig */ = {isa = PBXFileReference; includeInIndex = 1; lastKnownFileType = text.xcconfig; name = "Pods-Clip Manager.debug.xcconfig"; path = "Pods/Target Support Files/Pods-Clip Manager/Pods-Clip Manager.debug.xcconfig"; sourceTree = "<group>"; };
 		A153B29E1FC830B10086FA19 /* Clip Manager.app */ = {isa = PBXFileReference; explicitFileType = wrapper.application; includeInIndex = 0; path = "Clip Manager.app"; sourceTree = BUILT_PRODUCTS_DIR; };
 		A153B2A11FC830B10086FA19 /* AppDelegate.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = AppDelegate.swift; sourceTree = "<group>"; };
@@ -158,6 +160,7 @@
 				A153B2FC1FCD43BC0086FA19 /* Clip.swift */,
 				A153B2FE1FCDCE6F0086FA19 /* ClipCollectionViewItem.swift */,
 				A153B2FF1FCDCE6F0086FA19 /* ClipCollectionViewItem.xib */,
+				12EB8F02204D756000A74B7D /* ClipCollectionViewItemView.swift */,
 			);
 			path = "Clip Manager";
 			sourceTree = "<group>";
@@ -390,6 +393,7 @@
 				12EB8F01204D6A6000A74B7D /* WindowController.swift in Sources */,
 				A1C9963C1FCF685F009944A1 /* SoundManagerDelegate.swift in Sources */,
 				A153B3001FCDCE6F0086FA19 /* ClipCollectionViewItem.swift in Sources */,
+				12EB8F03204D756000A74B7D /* ClipCollectionViewItemView.swift in Sources */,
 			);
 			runOnlyForDeploymentPostprocessing = 0;
 		};

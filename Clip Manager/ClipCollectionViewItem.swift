@@ -17,7 +17,7 @@ let progressColor = NSColor(white: 1.0, alpha: 1.0)
 let almostDoneColor = NSColor(red: 1.0, green: 0.933333, blue: 0.4, alpha: 1.0)
 let deviceColor = NSColor(red: 0.25, green: 0.25, blue: 1.0, alpha: 1.0)
 
-class ClipCollectionViewItem: NSCollectionViewItem, SoundManagerProgressDelegate, EventSubscriber {
+class ClipCollectionViewItem: NSCollectionViewItem, NSDraggingDestination, SoundManagerProgressDelegate, EventSubscriber {
 	@IBOutlet weak var numberField: NSTextField!
 	@IBOutlet weak var progressField: NSTextField!
 	@IBOutlet weak var audioPopUpButton: NSPopUpButton!
@@ -37,6 +37,10 @@ class ClipCollectionViewItem: NSCollectionViewItem, SoundManagerProgressDelegate
 		didSet {
 			guard isViewLoaded else { return }
 			DispatchQueue.main.async {
+				if let view = self.view as? ClipCollectionViewItemView {
+					view.index = self.index
+				}
+
 				self.updateDataView()
 			}
 		}
@@ -146,9 +150,9 @@ class ClipCollectionViewItem: NSCollectionViewItem, SoundManagerProgressDelegate
 	}
 
 	@IBAction func fileSelectClick(_ sender: Any) {
-		if let i = index {
+		if let index = self.index {
 			if let appDelegate = NSApplication.shared.delegate as? AppDelegate {
-				appDelegate.openAudioFileForIndex(i)
+				appDelegate.openAudioFileForIndex(index)
 			}
 		}
 	}
@@ -173,11 +177,11 @@ class ClipCollectionViewItem: NSCollectionViewItem, SoundManagerProgressDelegate
 			default:
 				NSLog("Received an audio hardware event")
 			}
-
 		}
 	}
 
 	// Time tools
+	// TODO: Move elsewhere
 
 	func formatTime(seconds: Int) -> [String: Int] {
 		var s = seconds
