@@ -64,8 +64,9 @@ class SoundManager: NSObject, AVAudioPlayerDelegate {
 
 	let numClips = 8
 
+    var inPort = MIDIPortRef()
 	var outPort = MIDIPortRef()
-	var outEndpoint = MIDIEndpointRef()
+    var outEndpoints = Array<MIDIEndpointRef>()
 
 	var clips = Dictionary<Int, Clip>()
 	private var timers = Dictionary<Int, Timer>()
@@ -305,16 +306,19 @@ class SoundManager: NSObject, AVAudioPlayerDelegate {
 
 	func setIndexActivityIndicator(index: Int, on: Bool) {
 		if let note = indexNotes[index] {
-			if outPort != 0 && outEndpoint != 0 {
-				let status = on ? 0x90 : 0x80
-				let dataToSend: [UInt8] = [UInt8(status), UInt8(note), UInt8(1)]
-
-				var packetList = MIDIPacketList()
-				var packet = MIDIPacketListInit(&packetList)
-				packet = MIDIPacketListAdd(&packetList, 1024, packet, 0, 3, dataToSend)
-
-				NSLog("Trying to send MIDI packet list %@", dataToSend)
-				CheckError(MIDISend(outPort, outEndpoint, &packetList), "Couldn't send MIDI packet list")
+			if outPort != 0 {
+                let status = on ? 0x90 : 0x80
+                
+                for endpoint in outEndpoints {
+                    let dataToSend: [UInt8] = [UInt8(status), UInt8(note), UInt8(1)]
+                    
+                    var packetList = MIDIPacketList()
+                    var packet = MIDIPacketListInit(&packetList)
+                    packet = MIDIPacketListAdd(&packetList, 1024, packet, 0, 3, dataToSend)
+                    
+                    NSLog("Trying to send MIDI packet list %@", dataToSend)
+                    CheckError(MIDISend(outPort, endpoint, &packetList), "Couldn't send MIDI packet list")
+                }
 			}
 		}
 	}
@@ -322,11 +326,25 @@ class SoundManager: NSObject, AVAudioPlayerDelegate {
 	func updateActivityIndicatorForIndex(_ index: Int) {
 		setIndexActivityIndicator(index: index, on: timers[index] != nil)
 	}
+    
+    func isCompatibleDeviceName(_ name: String) -> Bool {
+        return name.contains("LPD") ||
+            name.contains("MPC") ||
+            name.contains("Akai")
+    }
 
 	private func setupMIDI() {
 		let MIDINotifyCallback: MIDINotifyProc = { message, refCon in
-			// TODO: Reload if messageId == 1
-			print("MIDI notify, messageID=\(message.pointee.messageID.rawValue)")
+            let messageId = message.pointee.messageID
+			print("MIDI notify, messageID=\(messageId.rawValue)")
+            
+            // Reload devices if setup changed
+            if messageId == .msgSetupChanged {
+                // Voodoo to retrieve the reference to the sound manager object back in here...
+                let me = Unmanaged<SoundManager>.fromOpaque(refCon!).takeUnretainedValue()
+                
+                me.setupMIDIDevices()
+            }
 		}
 
 		let MIDIReadCallback: MIDIReadProc = { pktlist, refCon, connRefCon in
@@ -358,13 +376,12 @@ class SoundManager: NSObject, AVAudioPlayerDelegate {
 		}
 
 		var client = MIDIClientRef()
-		var inPort = MIDIPortRef()
 
 		// Voodoo to send the reference to the sound manager in there...
 		let passedSelf = UnsafeMutableRawPointer(Unmanaged.passUnretained(self).toOpaque())
 
 		CheckError(
-			MIDIClientCreate("Clip Manager" as CFString, MIDINotifyCallback, nil, &client),
+			MIDIClientCreate("Clip Manager" as CFString, MIDINotifyCallback, passedSelf, &client),
 			"Couldn't create MIDI client"
 		)
 
@@ -372,47 +389,67 @@ class SoundManager: NSObject, AVAudioPlayerDelegate {
 			MIDIInputPortCreate(client, "Clip Manager input port" as CFString, MIDIReadCallback, passedSelf, &inPort),
 			"Couldn't create MIDI input port"
 		)
+        
 		CheckError(
 			MIDIOutputPortCreate(client, "Clip Manager output port" as CFString, &outPort),
 			"Couldn't create output port"
 		)
-
-		let sourceCount = MIDIGetNumberOfSources()
-		print("\(sourceCount) sources")
-
-		for i in 0..<sourceCount {
-			let src = MIDIGetSource(i)
-			var endpointName: Unmanaged<CFString>?
-
-			CheckError(
-				MIDIObjectGetStringProperty(src, kMIDIPropertyName, &endpointName),
-				"Couldn't get endpoint name"
-			)
-
-			print("  source \(i): \(endpointName!.takeRetainedValue() as String)")
-
-			CheckError(
-				MIDIPortConnectSource(inPort, src, nil),
-				"Couldn't connect MIDI port"
-			)
-		}
-
-		let destCount = MIDIGetNumberOfDestinations()
-		print("\(destCount) destinations")
-
-		for i in 0..<destCount {
-			let dest = MIDIGetDestination(i)
-			var endpointName: Unmanaged<CFString>?
-
-			CheckError(
-				MIDIObjectGetStringProperty(dest, kMIDIPropertyName, &endpointName),
-				"Couldn't get endpoint name"
-			)
-
-			print("  dest \(i): \(endpointName!.takeRetainedValue() as String)")
-			outEndpoint = dest
-		}
+        
+        print("Output port: \(outPort)")
+        
+        setupMIDIDevices()
 	}
+    
+    func setupMIDIDevices() {
+        let sourceCount = MIDIGetNumberOfSources()
+        print("\(sourceCount) sources")
+        
+        for i in 0..<sourceCount {
+            let src = MIDIGetSource(i)
+            var rawEndpointName: Unmanaged<CFString>?
+            
+            CheckError(
+                MIDIObjectGetStringProperty(src, kMIDIPropertyName, &rawEndpointName),
+                "Couldn't get endpoint name"
+            )
+            
+            let endpointName = rawEndpointName!.takeRetainedValue() as String
+            
+            print("  source \(i): \(endpointName)")
+            
+            if isCompatibleDeviceName(endpointName) {
+                print("Connecting to above")
+                
+                CheckError(
+                    MIDIPortConnectSource(inPort, src, nil),
+                    "Couldn't connect MIDI port"
+                )
+            }
+        }
+        
+        let destCount = MIDIGetNumberOfDestinations()
+        print("\(destCount) destinations")
+        outEndpoints.removeAll()
+        
+        for i in 0..<destCount {
+            let dest = MIDIGetDestination(i)
+            var rawEndpointName: Unmanaged<CFString>?
+            
+            CheckError(
+                MIDIObjectGetStringProperty(dest, kMIDIPropertyName, &rawEndpointName),
+                "Couldn't get endpoint name"
+            )
+            
+            let endpointName = rawEndpointName!.takeRetainedValue() as String
+            
+            print("  dest \(i): \(endpointName)")
+            
+            if isCompatibleDeviceName(endpointName) {
+                outEndpoints.append(dest)
+                print("Adding to list of endpoints")
+            }
+        }
+    }
 
 	func outputDeviceIds() -> [String] {
 		let devices = AudioDevice.allOutputDevices()
